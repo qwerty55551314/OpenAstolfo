@@ -1,0 +1,33 @@
+package net.minecraft.inventory;
+
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityFurnace;
+
+public class SlotFurnaceFuel extends Slot {
+   public SlotFurnaceFuel(IInventory inventoryIn, int slotIndex, int xPosition, int yPosition) {
+      super(inventoryIn, slotIndex, xPosition, yPosition);
+   }
+
+   @Override
+   public boolean isItemValid(ItemStack stack) {
+      return TileEntityFurnace.isItemFuel(stack) || isBucket(stack);
+   }
+
+   @Override
+   public int getItemStackLimit(ItemStack stack) {
+      return isBucket(stack) ? 1 : super.getItemStackLimit(stack);
+   }
+
+   public static boolean isBucket(ItemStack stack) {
+      if (stack != null) {
+         Item item = stack.getItem();
+         if (item != null && stack.getItem() == Items.bucket) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+}

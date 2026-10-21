@@ -1,0 +1,153 @@
+package net.minecraft.inventory;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
+
+public class InventoryCrafting implements IInventory {
+   private final ItemStack[] stackList;
+   private final int inventoryWidth;
+   private final int inventoryHeight;
+   private final Container eventHandler;
+   private static final String b = "container.crafting";
+   private static final long c = 8138514146002993216L;
+
+   public InventoryCrafting(Container eventHandlerIn, int width, int height) {
+      int i = width * height;
+      this.stackList = new ItemStack[i];
+      this.eventHandler = eventHandlerIn;
+      this.inventoryWidth = width;
+      this.inventoryHeight = height;
+   }
+
+   @Override
+   public int getSizeInventory() {
+      return this.stackList.length;
+   }
+
+   @Override
+   public ItemStack getStackInSlot(int index) {
+      return index >= this.getSizeInventory() ? null : this.stackList[index];
+   }
+
+   public ItemStack getStackInRowAndColumn(int row, int column) {
+      return row >= 0 && row < this.inventoryWidth && column >= 0 && column <= this.inventoryHeight
+         ? this.getStackInSlot(row + column * this.inventoryWidth)
+         : null;
+   }
+
+   @Override
+   public String getName() {
+      return b;
+   }
+
+   @Override
+   public boolean hasCustomName() {
+      return false;
+   }
+
+   @Override
+   public IChatComponent getDisplayName() {
+      return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName()));
+   }
+
+   @Override
+   public ItemStack removeStackFromSlot(int index) {
+      if (this.stackList[index] != null) {
+         ItemStack itemstack = this.stackList[index];
+         this.stackList[index] = null;
+         return itemstack;
+      } else {
+         return null;
+      }
+   }
+
+   @Override
+   public ItemStack decrStackSize(int index, int count) {
+      ItemStack itemstack1 = this.stackList[index];
+      if (itemstack1 != null) {
+         ItemStack itemstack2 = this.stackList[index];
+         if (itemstack2.stackSize <= count) {
+            ItemStack itemstack4 = this.stackList[index];
+            this.stackList[index] = null;
+            this.eventHandler.onCraftMatrixChanged(this);
+            return itemstack4;
+         } else {
+            ItemStack itemstack = this.stackList[index].splitStack(count);
+            ItemStack itemstack3 = this.stackList[index];
+            if (itemstack3.stackSize == 0) {
+               this.stackList[index] = null;
+            }
+
+            this.eventHandler.onCraftMatrixChanged(this);
+            return itemstack;
+         }
+      } else {
+         return null;
+      }
+   }
+
+   @Override
+   public void setInventorySlotContents(int index, ItemStack stack) {
+      this.stackList[index] = stack;
+      this.eventHandler.onCraftMatrixChanged(this);
+   }
+
+   @Override
+   public int getInventoryStackLimit() {
+      return (int)c;
+   }
+
+   @Override
+   public void markDirty() {
+   }
+
+   @Override
+   public boolean isUseableByPlayer(EntityPlayer player) {
+      return true;
+   }
+
+   @Override
+   public void openInventory(EntityPlayer player) {
+   }
+
+   @Override
+   public void closeInventory(EntityPlayer player) {
+   }
+
+   @Override
+   public boolean isItemValidForSlot(int index, ItemStack stack) {
+      return true;
+   }
+
+   @Override
+   public int getField(int id) {
+      return 0;
+   }
+
+   @Override
+   public void setField(int id, int value) {
+   }
+
+   @Override
+   public int getFieldCount() {
+      return 0;
+   }
+
+   @Override
+   public void clear() {
+      for (int i = 0; i < this.stackList.length; i++) {
+         this.stackList[i] = null;
+      }
+   }
+
+   public int getHeight() {
+      return this.inventoryHeight;
+   }
+
+   public int getWidth() {
+      return this.inventoryWidth;
+   }
+}

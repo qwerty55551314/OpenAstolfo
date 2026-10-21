@@ -1,0 +1,14 @@
+package astolfo.loader.check;
+
+import astolfo.loader.AbstractLoadStage;
+import java.util.List;
+
+public abstract class AbstractVerdictResolver implements VerdictResolver {
+   private static int l;
+
+   public final Verdict processRelation(List<VerdictProcessor> list, CheckRequest checkRequest, Verdict verdict, AbstractLoadStage abstractLoadStage) {
+      abstractLoadStage.setState(1);
+      abstractLoadStage.getAction().run();
+      return list.isEmpty() ? verdict : list.stream().map(verdictProcessor -> verdictProcessor.process(checkRequest, verdict)).findFirst().orElse(verdict);
+   }
+}

@@ -1,0 +1,14 @@
+package astolfo.setting;
+
+public enum ColorMode {
+   NONE(0),
+   RAINBOW(1),
+   PULSATE(2);
+
+   public final int index;
+   private static final ColorMode[] VALUES = new ColorMode[]{NONE, RAINBOW, PULSATE};
+
+   private ColorMode(int i2) {
+      this.index = i2;
+   }
+}

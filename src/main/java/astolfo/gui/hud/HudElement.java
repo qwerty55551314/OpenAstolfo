@@ -1,0 +1,39 @@
+package astolfo.gui.hud;
+
+import astolfo.gui.component.Component;
+import astolfo.setting.NumberSetting;
+
+public abstract class HudElement extends Component {
+   private boolean visible;
+   private NumberSetting<Float> posX = new NumberSetting<>("Pos-X", "Pos-X", 0.0F, 0.0F, 10000.0F);
+   private NumberSetting<Float> posY = new NumberSetting<>("Pos-Y", "Pos-Y", 0.0F, 0.0F, 10000.0F);
+   private final NumberSetting<Float> scale = new NumberSetting<>("Scale", "Scale", 2.0F, 1.0F, 4.0F);
+
+   public HudElement(String string, float f, float g, int i, int j) {
+      super(string, f, g, i, j);
+      if (null != null) {
+         int i1 = 29;
+         i1++;
+      }
+   }
+
+   public boolean isVisible() {
+      return this.visible;
+   }
+
+   public void setVisible(boolean bl) {
+      this.visible = bl;
+   }
+
+   public NumberSetting<Float> getPosX() {
+      return this.posX;
+   }
+
+   public NumberSetting<Float> getPosY() {
+      return this.posY;
+   }
+
+   public NumberSetting<Float> getScale() {
+      return this.scale;
+   }
+}

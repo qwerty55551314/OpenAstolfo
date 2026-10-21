@@ -1,0 +1,65 @@
+package net.minecraft.src;
+
+public class IntArray {
+   private int[] array = null;
+   private int position = 0;
+   private int limit = 0;
+
+   public IntArray(int size) {
+      this.array = new int[size];
+   }
+
+   public void put(int x) {
+      this.array[this.position] = x;
+      boolean flag = true;
+      this.position++;
+      if (this.limit < this.position) {
+         this.limit = this.position;
+      }
+   }
+
+   public void putAt(int i, int j) {
+      this.array[i] = j;
+      if (this.limit < i) {
+         this.limit = i;
+      }
+   }
+
+   public void position(int pos) {
+      this.position = pos;
+   }
+
+   public void putAll(int[] ints) {
+      int i = ints.length;
+
+      for (int j = 0; j < i; j++) {
+         this.array[this.position] = ints[j];
+         this.position++;
+      }
+
+      if (this.limit < this.position) {
+         this.limit = this.position;
+      }
+   }
+
+   public int get(int pos) {
+      return this.array[pos];
+   }
+
+   public int[] getArray() {
+      return this.array;
+   }
+
+   public void clear() {
+      this.position = 0;
+      this.limit = 0;
+   }
+
+   public int getLimit() {
+      return this.limit;
+   }
+
+   public int getPosition() {
+      return this.position;
+   }
+}

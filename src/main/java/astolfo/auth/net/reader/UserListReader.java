@@ -1,0 +1,28 @@
+package astolfo.auth.net.reader;
+
+import astolfo.auth.net.PacketReader;
+import astolfo.auth.packet.UserListPacket;
+import astolfo.auth.packet.UserListType;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
+public final class UserListReader implements PacketReader<UserListPacket> {
+   private UserListPacket packet;
+
+   @Override
+   public void read(ByteBuffer byteBuffer) {
+      byte[] bytes = new byte[byteBuffer.getInt()];
+      byteBuffer.get(bytes);
+      byte[] bytes2 = new byte[byteBuffer.getInt()];
+      byteBuffer.get(bytes2);
+      int i = byteBuffer.getInt();
+      int j = byteBuffer.getInt();
+      this.packet = new UserListPacket(
+         UserListType.values()[i], new String(bytes, StandardCharsets.UTF_8), new String(bytes2, StandardCharsets.UTF_8), j == 1
+      );
+   }
+
+   public UserListPacket getPacket() {
+      return this.packet;
+   }
+}

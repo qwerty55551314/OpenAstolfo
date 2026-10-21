@@ -1,0 +1,200 @@
+package net.minecraft.client.gui.spectator;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiSpectator;
+import net.minecraft.client.gui.spectator.categories.SpectatorDetails;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
+
+public class SpectatorMenu {
+   private static final ISpectatorMenuObject field_178655_b = new SpectatorMenu.EndSpectatorObject();
+   private static final ISpectatorMenuObject field_178656_c = new SpectatorMenu.MoveMenuObject(-1, true);
+   private static final ISpectatorMenuObject field_178653_d = new SpectatorMenu.MoveMenuObject(1, true);
+   private static final ISpectatorMenuObject field_178654_e = new SpectatorMenu.MoveMenuObject(1, false);
+   public static final ISpectatorMenuObject field_178657_a = new ISpectatorMenuObject() {
+      @Override
+      public void func_178661_a(SpectatorMenu menu) {
+      }
+
+      @Override
+      public IChatComponent getSpectatorName() {
+         return new ChatComponentText("");
+      }
+
+      @Override
+      public void func_178663_a(float f, int alpha) {
+      }
+
+      @Override
+      public boolean func_178662_A_() {
+         return false;
+      }
+   };
+   private final ISpectatorMenuRecipient field_178651_f;
+   private final List<SpectatorDetails> field_178652_g = Lists.newArrayList();
+   private ISpectatorMenuView field_178659_h = new BaseSpectatorGroup();
+   private int field_178660_i = -1;
+   private int field_178658_j;
+   private static int T;
+
+   public SpectatorMenu(ISpectatorMenuRecipient iSpectatorMenuRecipient) {
+      this.field_178651_f = iSpectatorMenuRecipient;
+   }
+
+   public ISpectatorMenuObject func_178643_a(int i) {
+      int i1 = i + this.field_178658_j * 6;
+      int j = this.field_178658_j;
+      return j > 0 && i == 0
+         ? field_178656_c
+         : (
+            i == 7
+               ? (i1 < this.field_178659_h.func_178669_a().size() ? field_178653_d : field_178654_e)
+               : (
+                  i == 8
+                     ? field_178655_b
+                     : (
+                        i1 >= 0 && i1 < this.field_178659_h.func_178669_a().size()
+                           ? Objects.firstNonNull(this.field_178659_h.func_178669_a().get(i1), field_178657_a)
+                           : field_178657_a
+                     )
+               )
+         );
+   }
+
+   public List<ISpectatorMenuObject> func_178642_a() {
+      ArrayList arraylist = Lists.newArrayList();
+
+      for (int i = 0; i <= 8; i++) {
+         arraylist.add(this.func_178643_a(i));
+      }
+
+      return arraylist;
+   }
+
+   public ISpectatorMenuObject func_178645_b() {
+      return this.func_178643_a(this.field_178660_i);
+   }
+
+   public ISpectatorMenuView func_178650_c() {
+      return this.field_178659_h;
+   }
+
+   public void func_178644_b(int i) {
+      ISpectatorMenuObject ispectatormenuobject = this.func_178643_a(i);
+      if (ispectatormenuobject != field_178657_a) {
+         if (this.field_178660_i == i && ispectatormenuobject.func_178662_A_()) {
+            ispectatormenuobject.func_178661_a(this);
+         } else {
+            this.field_178660_i = i;
+         }
+      }
+   }
+
+   public void func_178641_d() {
+      this.field_178651_f.func_175257_a(this);
+   }
+
+   public int func_178648_e() {
+      return this.field_178660_i;
+   }
+
+   public void func_178647_a(ISpectatorMenuView iSpectatorMenuView) {
+      this.field_178652_g.add(this.func_178646_f());
+      this.field_178659_h = iSpectatorMenuView;
+      this.field_178660_i = -1;
+      this.field_178658_j = 0;
+   }
+
+   public SpectatorDetails func_178646_f() {
+      return new SpectatorDetails(this.field_178659_h, this.func_178642_a(), this.field_178660_i);
+   }
+
+   static int access$112(SpectatorMenu spectatorMenu, int i) {
+      return spectatorMenu.field_178658_j = i;
+   }
+
+   static {
+      h(86);
+   }
+
+   public static void h(int i) {
+      T = i;
+   }
+
+   public static int T() {
+      return T;
+   }
+
+   public static int k() {
+      return 0;
+   }
+
+   public static class EndSpectatorObject implements ISpectatorMenuObject {
+      private static final String b = "Close menu";
+
+      public EndSpectatorObject() {
+      }
+
+      @Override
+      public void func_178661_a(SpectatorMenu menu) {
+         menu.func_178641_d();
+      }
+
+      @Override
+      public IChatComponent getSpectatorName() {
+         return new ChatComponentText(b);
+      }
+
+      @Override
+      public void func_178663_a(float f, int alpha) {
+         Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
+         Gui.drawModalRectWithCustomSizedTexture(0, 0, 128.0F, 0.0F, 16, 16, 256.0F, 256.0F);
+      }
+
+      @Override
+      public boolean func_178662_A_() {
+         return true;
+      }
+
+   }
+
+   public static class MoveMenuObject implements ISpectatorMenuObject {
+      private final int field_178666_a;
+      private final boolean field_178665_b;
+
+      public MoveMenuObject(int i, boolean bl) {
+         this.field_178666_a = i;
+         this.field_178665_b = bl;
+      }
+
+      @Override
+      public void func_178661_a(SpectatorMenu menu) {
+         SpectatorMenu.access$112(menu, this.field_178666_a);
+      }
+
+      @Override
+      public IChatComponent getSpectatorName() {
+         return this.field_178666_a < 0 ? new ChatComponentText("Previous Page") : new ChatComponentText("Next Page");
+      }
+
+      @Override
+      public void func_178663_a(float f, int alpha) {
+         Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
+         if (this.field_178666_a < 0) {
+            Gui.drawModalRectWithCustomSizedTexture(0, 0, 144.0F, 0.0F, 16, 16, 256.0F, 256.0F);
+         } else {
+            Gui.drawModalRectWithCustomSizedTexture(0, 0, 160.0F, 0.0F, 16, 16, 256.0F, 256.0F);
+         }
+      }
+
+      @Override
+      public boolean func_178662_A_() {
+         return this.field_178665_b;
+      }
+   }
+}

@@ -1,0 +1,15 @@
+package astolfo.auth.net;
+
+import astolfo.ClientAccess;
+import astolfo.auth.packet.LoginResponse;
+
+public interface LoginListener {
+   default void registerSidebarOnLogin(Object object) {
+      if (object instanceof LoginResponse) {
+         LoginResponse loginResponse = (LoginResponse)object;
+         if (loginResponse.success) {
+            ClientAccess.client.register(121968519176554L, ClientAccess.client.getSidebarGui());
+         }
+      }
+   }
+}

@@ -1,0 +1,75 @@
+package astolfo.via;
+
+import astolfo.via.commands.VRCommandHandler;
+import astolfo.via.platform.VRBackwardsLoader;
+import astolfo.via.platform.VRInjector;
+import astolfo.via.platform.VRLoader;
+import astolfo.via.platform.VRPlatform;
+import astolfo.via.platform.VRRewindLoader;
+import astolfo.via.protocol.ViaFabricHostnameProtocol;
+import com.google.common.collect.Range;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.viaversion.viaversion.ViaManagerImpl;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import io.netty.channel.EventLoop;
+import io.netty.channel.local.LocalEventLoopGroup;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+public enum ViaFabric {
+   INSTANCE;
+
+   private ProtocolVersion version = ProtocolVersion.v1_8;
+   public static boolean enabled = true;
+   public static final ExecutorService ASYNC_EXECUTOR;
+   public static final EventLoop EVENT_LOOP;
+   public static CompletableFuture<Void> INIT_FUTURE = new CompletableFuture<>();
+   private static final ViaFabric[] VALUES = new ViaFabric[]{INSTANCE};
+
+   public void init() {
+      boolean flag = true;
+      MappingDataLoader.enableMappingsCache();
+      Via.init(
+         ViaManagerImpl.builder().injector(new VRInjector()).loader(new VRLoader()).commandHandler(new VRCommandHandler()).platform(new VRPlatform()).build()
+      );
+      ((ViaManagerImpl)Via.getManager()).init();
+      Via.getManager().getProtocolManager().registerBaseProtocol(ViaFabricHostnameProtocol.instance, Range.lessThan(Integer.MIN_VALUE));
+      ProtocolVersion.register(-2, "AUTO");
+      INIT_FUTURE.complete(null);
+      new VRBackwardsLoader().run();
+      new VRRewindLoader().run();
+   }
+
+   public void setVersion(ProtocolVersion protocolVersion) {
+      this.version = protocolVersion;
+   }
+
+   public boolean isNative() {
+      return this.version.getVersion() == 47 || !enabled;
+   }
+
+   public boolean isAfter1_12_2() {
+      return this.version.getVersion() > ProtocolVersion.v1_12_2.getVersion();
+   }
+
+   public ProtocolVersion getVersion() {
+      return this.version;
+   }
+
+   static {
+      int short1 = 29374;
+      long i = 7312635741812825108L ^ 129834162052015L;
+      ThreadFactory threadfactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("ViaFabric-%d").build();
+      ASYNC_EXECUTOR = Executors.newFixedThreadPool(8, threadfactory);
+      EVENT_LOOP = new LocalEventLoopGroup(1, threadfactory).next();
+      EVENT_LOOP.submit(INIT_FUTURE::join);
+   }
+
+   public static boolean J() {
+      return true;
+   }
+}

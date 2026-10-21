@@ -1,0 +1,59 @@
+package net.minecraft.src;
+
+import java.util.Map;
+import java.util.Set;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.entity.EntityLivingBase;
+
+public class PlayerItemsLayer implements LayerRenderer {
+   private RenderPlayer renderPlayer = null;
+   private static final String b = "PlayerItemsLayer not registered";
+
+   public PlayerItemsLayer(RenderPlayer renderPlayer) {
+      this.renderPlayer = renderPlayer;
+   }
+
+   @Override
+   public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float f, float g, float partialTicks, float h, float f2, float f3, float scale) {
+      this.renderEquippedItems(entitylivingbaseIn, scale, partialTicks);
+   }
+
+   public void renderEquippedItems(EntityLivingBase entityLiving, float scale, float partialTicks) {
+      if (Config.isShowCapes() && entityLiving instanceof AbstractClientPlayer) {
+         AbstractClientPlayer abstractclientplayer = (AbstractClientPlayer)entityLiving;
+         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+         GlStateManager.disableRescaleNormal();
+         GlStateManager.enableCull();
+         ModelPlayer modelplayer = this.renderPlayer.getMainModel();
+         PlayerConfigurations.renderPlayerItems(modelplayer, abstractclientplayer, scale, partialTicks);
+         GlStateManager.disableCull();
+      }
+   }
+
+   @Override
+   public boolean shouldCombineTextures() {
+      return false;
+   }
+
+   public static void register(Map renderPlayerMap) {
+      Set set = renderPlayerMap.keySet();
+      boolean flag = false;
+
+      for (Object object : set) {
+         Object object1 = renderPlayerMap.get(object);
+         if (object1 instanceof RenderPlayer) {
+            RenderPlayer renderplayer = (RenderPlayer)object1;
+            renderplayer.addLayer(new PlayerItemsLayer(renderplayer));
+            flag = true;
+         }
+      }
+
+      if (!flag) {
+         Config.warn(b);
+      }
+   }
+}

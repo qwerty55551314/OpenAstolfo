@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+group = 'astolfo'
+version = 'latest'
+
+idea { module { excludeDirs += file('run') } }
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(8) }
+}
+
+def jdk8 = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(8) }
+
+dependencies {
+    implementation files('libs/astolfo-libs.jar')
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ['src/main/java'] }
+        resources { srcDirs = ['src/main/resources'] }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.fork = true
+    options.forkOptions.executable = jdk8.get().executablePath.asFile.absolutePath
+    options.forkOptions.memoryMaximumSize = '6g'
+    options.compilerArgs += ['-nowarn', '-Xmaxerrs', '100000', '-XDignore.symbol.file', '-proc:none']
+}
+
+tasks.named('processResources') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('clientJar', Jar) {
+    group = 'build'
+    description = 'Package the client classes and resources into one jar.'
+    archiveBaseName = 'astolfo-client'
+    archiveVersion = ''
+    destinationDirectory = layout.buildDirectory.dir('dist')
+    manifest { attributes 'Main-Class': 'start.Main' }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+}
+
+build.dependsOn 'clientJar'
+
+def gameDir = file('run')
+def assetsDir = providers.gradleProperty('assetsDir')
+        .orElse(System.getenv('APPDATA') != null ? "${System.getenv('APPDATA')}/.minecraft/assets" : "${gameDir}/assets")
+def playerName = providers.gradleProperty('username').orElse('Player')
+
+tasks.register('run', JavaExec) {
+    group = 'application'
+    description = 'Run the client with run/ as the game directory.'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(8) }
+    mainClass = 'start.Main'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = gameDir
+    maxHeapSize = '4g'
+    jvmArgs "-Djava.library.path=${new File(gameDir, 'natives')}",
+            '-Dos.name=Windows 10', '-Dos.version=10.0', '-XX:+UseG1GC'
+    args '--username', playerName.get(), '--version', '1.8.9',
+            '--gameDir', gameDir.absolutePath,
+            '--assetsDir', assetsDir.get(), '--assetIndex', '1.8',
+            '--uuid', '887341c45ea94dd3bae9bb00502124f1', '--accessToken', '0',
+            '--userProperties', '{}', '--userType', 'msa'
+    doFirst {
+        if (!new File(gameDir, 'natives').isDirectory()) throw new GradleException("Missing ${gameDir}/natives")
+        if (!new File(assetsDir.get(), 'indexes/1.8.json').isFile()) {
+            throw new GradleException("Minecraft 1.8 assets not found in ${assetsDir.get()}. Pass -PassetsDir=<.minecraft/assets>.")
+        }
+    }
+}

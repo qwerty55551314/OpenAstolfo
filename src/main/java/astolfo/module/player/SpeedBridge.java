@@ -1,0 +1,119 @@
+package astolfo.module.player;
+
+import astolfo.event.EventHandler;
+import astolfo.event.EventState;
+import astolfo.event.Listener;
+import astolfo.event.player.SafeWalkEvent;
+import astolfo.event.player.UpdateEvent;
+import astolfo.module.Category;
+import astolfo.module.Module;
+import astolfo.setting.NumberSetting;
+import astolfo.util.Stopwatch;
+import net.minecraft.block.BlockAir;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.BlockPos;
+
+public class SpeedBridge extends Module {
+   private boolean autoSneaking;
+   private final NumberSetting<Integer> unsneak = new NumberSetting<>("Unsneak", "Delay before unsneaking", 150, 0, 500, "ms");
+   private final Stopwatch sneakTimer = new Stopwatch();
+   @EventHandler(UpdateEvent.class)
+   private Listener<UpdateEvent> onUpdate = updateEvent -> {
+      if (updateEvent.getState() == EventState.PRE) {
+         if ((
+               isNearEdge()
+                  || mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ)).getBlock() != null
+                     && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.0, mc.thePlayer.posZ)).getBlock() instanceof BlockAir
+            )
+            && this.canBridge()) {
+            mc.gameSettings.keyBindSneak.pressed = true;
+            this.autoSneaking = true;
+            this.sneakTimer.reset();
+         } else if ((this.sneakTimer.hasElapsed(this.unsneak.getValue().intValue()) || !mc.thePlayer.onGround) && this.autoSneaking) {
+            mc.gameSettings.keyBindSneak.pressed = false;
+            this.autoSneaking = false;
+         }
+      }
+   };
+   @EventHandler(SafeWalkEvent.class)
+   private Listener<SafeWalkEvent> onSafeWalk = safeWalkEvent -> {
+      if (mc.thePlayer != null && this.canBridge()) {
+         safeWalkEvent.setSafe(true);
+         safeWalkEvent.cancel();
+      }
+   };
+
+   public SpeedBridge(Category category) {
+      super(category);
+      this.addSettings(this.unsneak);
+   }
+
+   @Override
+   public void onDisable() {
+      mc.gameSettings.keyBindSneak.pressed = false;
+      super.onDisable();
+   }
+
+   private boolean canBridge() {
+      return mc.thePlayer.onGround
+         && mc.thePlayer.isCollidedVertically
+         && mc.thePlayer.rotationPitch > 50.0F
+         && mc.thePlayer.getCurrentEquippedItem() != null
+         && mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemBlock;
+   }
+
+   public static boolean isNearEdge() {
+      double d = mc.thePlayer.motionX;
+      double e = mc.thePlayer.motionY;
+      double d2 = mc.thePlayer.motionZ;
+      double d3 = d;
+      double d4 = d2;
+      double d5 = d3;
+      double d6 = d4;
+      double d7 = 0.05;
+
+      while (d != 0.0 && mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, mc.thePlayer.getEntityBoundingBox().offset(d, -1.0, 0.0)).isEmpty()) {
+         if (d < d7 && d >= -d7) {
+            d = 0.0;
+         } else if (d > 0.0) {
+            d -= d7;
+         } else {
+            d += d7;
+         }
+      }
+
+      while (d2 != 0.0 && mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, mc.thePlayer.getEntityBoundingBox().offset(0.0, -1.0, d2)).isEmpty()) {
+         if (d2 < d7 && d2 >= -d7) {
+            d2 = 0.0;
+         } else if (d2 > 0.0) {
+            d2 -= d7;
+         } else {
+            d2 += d7;
+         }
+      }
+
+      while (
+         d != 0.0
+            && d2 != 0.0
+            && mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, mc.thePlayer.getEntityBoundingBox().offset(d, -1.0, d2)).isEmpty()
+      ) {
+         if (d < d7 && d >= -d7) {
+            d = 0.0;
+         } else if (d > 0.0) {
+            d -= d7;
+         } else {
+            d += d7;
+         }
+
+         if (d2 < d7 && d2 >= -d7) {
+            d2 = 0.0;
+         } else if (d2 > 0.0) {
+            d2 -= d7;
+         } else {
+            d2 += d7;
+         }
+      }
+
+      return d5 != d || d6 != d2;
+   }
+}

@@ -1,0 +1,12 @@
+package astolfo.lua.input;
+
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
+import org.lwjgl.input.Keyboard;
+
+public final class GetKeyNumber extends OneArgFunction {
+   @Override
+   public LuaValue call(LuaValue luaValue) {
+      return (LuaValue)(!luaValue.isstring() ? valueOf(false) : valueOf(Keyboard.getKeyIndex(luaValue.checkjstring())));
+   }
+}

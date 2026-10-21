@@ -1,0 +1,17 @@
+package astolfo.module.player;
+
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+
+public class ScaffoldTarget {
+   public BlockPos pos;
+   public EnumFacing facing;
+   public Vec3 hitVec;
+   public int unused;
+
+   public ScaffoldTarget(BlockPos blockPos, EnumFacing enumFacing) {
+      this.pos = blockPos;
+      this.facing = enumFacing;
+   }
+}

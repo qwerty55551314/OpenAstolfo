@@ -1,0 +1,40 @@
+package net.minecraft.item;
+
+import com.google.common.base.Function;
+import net.minecraft.block.Block;
+
+public class ItemMultiTexture extends ItemBlock {
+   public final Block theBlock;
+   public final Function<ItemStack, String> nameFunction;
+
+   public ItemMultiTexture(Block block, Block block2, Function<ItemStack, String> nameFunction) {
+      super(block);
+      this.theBlock = block2;
+      this.nameFunction = nameFunction;
+      this.setMaxDamage(0);
+      this.setHasSubtypes(true);
+   }
+
+   public ItemMultiTexture(Block block, Block block2, final String[] namesByMeta) {
+      this(block, block2, new Function<ItemStack, String>() {
+         public String apply(ItemStack itemStack) {
+            int i = itemStack.getMetadata();
+            if (i < 0 || i >= namesByMeta.length) {
+               i = 0;
+            }
+
+            return namesByMeta[i];
+         }
+      });
+   }
+
+   @Override
+   public int getMetadata(int damage) {
+      return damage;
+   }
+
+   @Override
+   public String getUnlocalizedName(ItemStack stack) {
+      return super.getUnlocalizedName() + "." + this.nameFunction.apply(stack);
+   }
+}

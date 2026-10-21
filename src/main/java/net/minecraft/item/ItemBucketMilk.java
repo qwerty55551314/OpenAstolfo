@@ -1,0 +1,48 @@
+package net.minecraft.item;
+
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.stats.StatList;
+import net.minecraft.world.World;
+
+public class ItemBucketMilk extends Item {
+   private static final long b = 7373298750795546656L;
+
+   public ItemBucketMilk() {
+      this.setMaxStackSize(1);
+      this.setCreativeTab(CreativeTabs.tabMisc);
+   }
+
+   @Override
+   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+      boolean flag = playerIn.capabilities.isCreativeMode;
+      if (!flag) {
+         stack.stackSize--;
+      }
+
+      boolean flag1 = worldIn.isRemote;
+      if (!flag1) {
+         playerIn.clearActivePotions();
+      }
+
+      playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
+      return stack.stackSize <= 0 ? new ItemStack(Items.bucket) : stack;
+   }
+
+   @Override
+   public int getMaxItemUseDuration(ItemStack stack) {
+      return (int)b;
+   }
+
+   @Override
+   public EnumAction getItemUseAction(ItemStack stack) {
+      return EnumAction.DRINK;
+   }
+
+   @Override
+   public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn) {
+      playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
+      return itemStackIn;
+   }
+}

@@ -1,0 +1,9 @@
+package astolfo.event;
+
+public interface Cancellable {
+   void cancel();
+
+   boolean isCancelled();
+
+   void setCancelled(boolean var1);
+}

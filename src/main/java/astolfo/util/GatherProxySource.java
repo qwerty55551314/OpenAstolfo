@@ -1,0 +1,67 @@
+package astolfo.util;
+
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class GatherProxySource implements ProxySource {
+   private final ExecutorService executor;
+   private String baseUrl = "http://gatherproxy.com/sockslist/country/?c=";
+   private String[] countries = new String[]{
+      "United%20States",
+      "Brazil",
+      "Mexico",
+      "Sweden",
+      "Norway",
+      "France",
+      "Taiwan",
+      "India",
+      "Republic%20of%20Korea",
+      "Denmark",
+      "Russia",
+      "China",
+      "Ukraine",
+      "Canada",
+      "Austria",
+      "Switzerland",
+      "Germany",
+      "Australia",
+      "Finland",
+      "Romania",
+      "Poland",
+      "Italy",
+      "Netherlands",
+      "United%20Kingdom",
+      "Spain",
+      "Singapore",
+      "Belgium",
+      "Portugal",
+      "Sweden"
+   };
+
+   public GatherProxySource() {
+      this.executor = Executors.newFixedThreadPool(25);
+   }
+
+   @Override
+   public Set<HostAndPort> scrap(EnumSet<ProxyType> enumSet) {
+      return new HashSet<>();
+   }
+
+   private boolean O(HostAndPort hostAndPort, Set<HostAndPort> set) {
+      for (HostAndPort hostandport : set) {
+         if (hostandport.equals(hostAndPort)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public void shutdown() {
+      this.executor.shutdownNow();
+   }
+}

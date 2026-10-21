@@ -1,0 +1,44 @@
+package net.minecraft.enchantment;
+
+import net.minecraft.util.ResourceLocation;
+
+public class EnchantmentLootBonus extends Enchantment {
+   public EnchantmentLootBonus(int i, ResourceLocation resourceLocation, int j, EnumEnchantmentType enumEnchantmentType) {
+      super(i, resourceLocation, j, enumEnchantmentType);
+      if (enumEnchantmentType == EnumEnchantmentType.DIGGER) {
+         this.setName("lootBonusDigger");
+      } else if (enumEnchantmentType == EnumEnchantmentType.FISHING_ROD) {
+         this.setName("lootBonusFishing");
+      } else {
+         this.setName("lootBonus");
+      }
+   }
+
+   @Override
+   public int getMinEnchantability(int enchantmentLevel) {
+      return 15 + (enchantmentLevel - 1) * 9;
+   }
+
+   @Override
+   public int getMaxEnchantability(int enchantmentLevel) {
+      return super.getMinEnchantability(enchantmentLevel) + 50;
+   }
+
+   @Override
+   public int getMaxLevel() {
+      return 3;
+   }
+
+   @Override
+   public boolean canApplyTogether(Enchantment ench) {
+      boolean flag = super.canApplyTogether(ench);
+      if (flag) {
+         int i = ench.effectId;
+         if (i != Enchantment.silkTouch.effectId) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+}

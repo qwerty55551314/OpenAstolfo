@@ -1,0 +1,50 @@
+package astolfo.auth.handler;
+
+import astolfo.auth.net.PacketOutput;
+import astolfo.auth.packet.IrcMessage;
+import astolfo.auth.packet.IrcMessageType;
+import astolfo.auth.packet.PacketId;
+import astolfo.chat.ChatManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+
+public class IrcMessageHandler extends PacketHandler<IrcMessage> {
+   public IrcMessageHandler() {
+      super(PacketId.IRC_MESSAGE);
+   }
+
+   public void handle(IrcMessage ircMessage, PacketOutput packetOutput) {
+      if (ircMessage.type == IrcMessageType.B) {
+         if (!ChatManager.isChatEnabled()) {
+            return;
+         }
+
+         String string = "@" + mc.mouseHelper.getAuthSession().getAccount().getUsername();
+         String string2 = ircMessage.message;
+         if (ircMessage.message.contains(string)) {
+            string2 = string2.replace(string, EnumChatFormatting.BOLD + "" + EnumChatFormatting.YELLOW + string + EnumChatFormatting.RESET);
+            if (ChatManager.isPingsEnabled()) {
+               Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("random.orb"), 1.0F));
+            }
+         }
+
+         if (ircMessage.sender.isEmpty()) {
+            chat.createBuilder(false, false).enableLinkDetection().append("[A]").bold().color(EnumChatFormatting.GOLD).append(" ").append(string2).build().send();
+         } else {
+            chat.createBuilder(false, false)
+               .enableLinkDetection()
+               .append("[A] ")
+               .bold()
+               .color(EnumChatFormatting.GOLD)
+               .append(ircMessage.sender)
+               .color(EnumChatFormatting.GRAY)
+               .append(": ")
+               .append(string2)
+               .build()
+               .send();
+         }
+      }
+   }
+}

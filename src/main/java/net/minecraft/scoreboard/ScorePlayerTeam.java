@@ -1,0 +1,150 @@
+package net.minecraft.scoreboard;
+
+import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Set;
+import net.minecraft.util.EnumChatFormatting;
+
+public class ScorePlayerTeam extends Team {
+   private final Scoreboard theScoreboard;
+   private final String registeredName;
+   private final Set<String> membershipSet = Sets.newHashSet();
+   private String teamNameSPT;
+   private String namePrefixSPT = "";
+   private String colorSuffix = "";
+   private boolean allowFriendlyFire = true;
+   private boolean canSeeFriendlyInvisibles = true;
+   private Team.EnumVisible nameTagVisibility = Team.EnumVisible.ALWAYS;
+   private Team.EnumVisible deathMessageVisibility = Team.EnumVisible.ALWAYS;
+   private EnumChatFormatting chatFormat = EnumChatFormatting.RESET;
+
+   public ScorePlayerTeam(Scoreboard theScoreboardIn, String name) {
+      this.theScoreboard = theScoreboardIn;
+      this.registeredName = name;
+      this.teamNameSPT = name;
+   }
+
+   @Override
+   public String getRegisteredName() {
+      return this.registeredName;
+   }
+
+   public String getTeamName() {
+      return this.teamNameSPT;
+   }
+
+   public void setTeamName(String name) {
+      if (name == null) {
+         throw new IllegalArgumentException("Name cannot be null");
+      } else {
+         this.teamNameSPT = name;
+         this.theScoreboard.sendTeamUpdate(this);
+      }
+   }
+
+   @Override
+   public Collection<String> getMembershipCollection() {
+      return this.membershipSet;
+   }
+
+   public String getColorPrefix() {
+      return this.namePrefixSPT;
+   }
+
+   public void setNamePrefix(String prefix) {
+      if (prefix == null) {
+         throw new IllegalArgumentException("Prefix cannot be null");
+      } else {
+         this.namePrefixSPT = prefix;
+         this.theScoreboard.sendTeamUpdate(this);
+      }
+   }
+
+   public String getColorSuffix() {
+      return this.colorSuffix;
+   }
+
+   public void setNameSuffix(String suffix) {
+      this.colorSuffix = suffix;
+      this.theScoreboard.sendTeamUpdate(this);
+   }
+
+   @Override
+   public String formatString(String input) {
+      return this.getColorPrefix() + input + this.getColorSuffix();
+   }
+
+   public static String formatPlayerName(Team team, String string) {
+      return team == null ? string : team.formatString(string);
+   }
+
+   @Override
+   public boolean getAllowFriendlyFire() {
+      return this.allowFriendlyFire;
+   }
+
+   public void setAllowFriendlyFire(boolean friendlyFire) {
+      this.allowFriendlyFire = friendlyFire;
+      this.theScoreboard.sendTeamUpdate(this);
+   }
+
+   @Override
+   public boolean getSeeFriendlyInvisiblesEnabled() {
+      return this.canSeeFriendlyInvisibles;
+   }
+
+   public void setSeeFriendlyInvisiblesEnabled(boolean friendlyInvisibles) {
+      this.canSeeFriendlyInvisibles = friendlyInvisibles;
+      this.theScoreboard.sendTeamUpdate(this);
+   }
+
+   @Override
+   public Team.EnumVisible getNameTagVisibility() {
+      return this.nameTagVisibility;
+   }
+
+   @Override
+   public Team.EnumVisible getDeathMessageVisibility() {
+      return this.deathMessageVisibility;
+   }
+
+   public void setNameTagVisibility(Team.EnumVisible enumVisible) {
+      this.nameTagVisibility = enumVisible;
+      this.theScoreboard.sendTeamUpdate(this);
+   }
+
+   public void setDeathMessageVisibility(Team.EnumVisible enumVisible) {
+      this.deathMessageVisibility = enumVisible;
+      this.theScoreboard.sendTeamUpdate(this);
+   }
+
+   public int func_98299_i() {
+      int b0 = 0;
+      boolean flag = this.getAllowFriendlyFire();
+      if (flag) {
+         b0 |= 1;
+      }
+
+      boolean flag1 = this.getSeeFriendlyInvisiblesEnabled();
+      if (flag1) {
+         b0 |= 2;
+      }
+
+      return b0;
+   }
+
+   public void func_98298_a(int i) {
+      int i1 = i & 1;
+      this.setAllowFriendlyFire(i1 > 0);
+      int j = i & 2;
+      this.setSeeFriendlyInvisiblesEnabled(j > 0);
+   }
+
+   public void setChatFormat(EnumChatFormatting enumChatFormatting) {
+      this.chatFormat = enumChatFormatting;
+   }
+
+   public EnumChatFormatting getChatFormat() {
+      return this.chatFormat;
+   }
+}

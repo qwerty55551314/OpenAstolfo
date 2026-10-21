@@ -1,0 +1,23 @@
+package oshi.driver.windows.wmi;
+
+import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery;
+import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
+import oshi.annotation.concurrent.ThreadSafe;
+import oshi.util.platform.windows.WmiQueryHandler;
+
+@ThreadSafe
+public final class Win32ComputerSystemProduct {
+   private static final String t = "Win32_ComputerSystemProduct";
+
+   private Win32ComputerSystemProduct() {
+   }
+
+   public static WmiResult<Win32ComputerSystemProduct.ComputerSystemProductProperty> queryIdentifyingNumber() {
+      WmiQuery wmiquery = new WmiQuery<>("Win32_ComputerSystemProduct", Win32ComputerSystemProduct.ComputerSystemProductProperty.class);
+      return WmiQueryHandler.createInstance().queryWMI(wmiquery);
+   }
+
+   public static enum ComputerSystemProductProperty {
+      IDENTIFYINGNUMBER;
+   }
+}

@@ -1,0 +1,5 @@
+package astolfo.loader.check;
+
+public interface ValueChecker {
+   ValueCheckOutcome resolveObject(Object var1);
+}

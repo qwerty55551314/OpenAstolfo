@@ -1,0 +1,20 @@
+package astolfo.lua.player;
+
+import astolfo.ClientAccess;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
+import org.luaj.vm2.lib.VarArgFunction;
+
+public final class Strafe extends VarArgFunction {
+   @Override
+   public Varargs onInvoke(Varargs varargs) {
+      return (Varargs)(ClientAccess.mc.thePlayer == null
+         ? NIL
+         : LuaValue.varargsOf(
+            new LuaValue[]{
+               LuaValue.valueOf((double)ClientAccess.mc.thePlayer.movementInput.moveForward),
+               LuaValue.valueOf((double)ClientAccess.mc.thePlayer.movementInput.moveStrafe)
+            }
+         ));
+   }
+}

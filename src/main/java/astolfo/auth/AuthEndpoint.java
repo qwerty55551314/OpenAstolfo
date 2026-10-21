@@ -1,0 +1,61 @@
+package astolfo.auth;
+
+import astolfo.util.RandomUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class AuthEndpoint {
+   public static ArrayList<Integer> PORTS = new ArrayList<>(Arrays.asList(29367));
+   public static boolean unusedFlag;
+   private final String host;
+   private PortChoice port;
+   private AuthConnection connection;
+   private static int[] S;
+
+   public AuthEndpoint(String string) {
+      this.host = string;
+      this.choosePort();
+   }
+
+   public AuthConnection getConnection() {
+      if (this.connection == null) {
+         this.connection = new AuthConnection();
+      }
+
+      return this.connection;
+   }
+
+   public void setConnection(AuthConnection authConnection) {
+      this.choosePort();
+      this.connection = authConnection;
+   }
+
+   public String getHost() {
+      return this.host;
+   }
+
+   public PortChoice getPort() {
+      return this.port;
+   }
+
+   private void choosePort() {
+      int i = RandomUtils.SECURE_RANDOM.nextInt(PORTS.size());
+      this.port = new PortChoice(i, PORTS.get(i));
+   }
+
+   public static void resetPorts() {
+      PORTS = new ArrayList<>(Arrays.asList(29367));
+   }
+
+   static {
+      K(new int[1]);
+   }
+
+   public static void K(int[] iArray) {
+      S = iArray;
+   }
+
+   public static int[] u() {
+      return S;
+   }
+}
